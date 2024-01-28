@@ -18,7 +18,6 @@ type App struct {
 	LogFileExt  string
 	TimeFormat  string
 
-	RunMode    string
 	EnableCors bool
 }
 
