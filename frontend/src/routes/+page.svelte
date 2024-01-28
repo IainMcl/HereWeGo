@@ -1,10 +1,14 @@
-<script>
+<script lang="ts">
 	import { Button } from "$lib/components/ui/button";
+	import { request } from "$lib/services/api-service/apiService";
 
-	const log = () => {
-		count++;
+	let resp: string = "";
+	// Get response from test api
+	const test = async () => {
+		const response = await request("");
+		console.log(response);
+		resp = response.message;
 	};
-	let count = 0;
 </script>
 
 <svelte:head>
@@ -13,5 +17,5 @@
 </svelte:head>
 
 <section>
-	<Button on:click={log}>Hello {count}</Button>
+	<Button on:click={test}>Hello {resp}</Button>
 </section>

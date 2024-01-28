@@ -1,4 +1,4 @@
 <script lang="ts">
 </script>
 
-<footer class="bg-green-500">Iain was here</footer>
+<footer class="h-10 bg-blue-500">Iain was here</footer>

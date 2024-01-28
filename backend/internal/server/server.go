@@ -3,11 +3,10 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
-	"HereWeGo/internal/database"
+	"github.com/IainMcl/HereWeGo/internal/database"
+	"github.com/IainMcl/HereWeGo/internal/settings"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -17,7 +16,7 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	port := settings.ServerSettings.HttpPort
 	NewServer := &Server{
 		port: port,
 		db:   database.New(),
