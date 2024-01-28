@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
+	e.Logger.SetOutput(logging.F)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 

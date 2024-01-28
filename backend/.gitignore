@@ -24,3 +24,9 @@ tmp/
 
 # .env file
 .env
+config.ini
+
+# Log files
+*.log
+
+main
