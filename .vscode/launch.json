@@ -14,6 +14,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/backend/cmd/api/main.go",
+            "cwd": "${workspaceFolder}/backend/",
             "env": {},
             "args": []
         }
