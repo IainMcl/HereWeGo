@@ -9,12 +9,16 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "github.com/swaggo/echo-swagger/example/docs"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
 	if settings.ServerSettings.RunMode != "debug" {
 		e.Logger.SetOutput(logging.F)
+	} else {
+		e.Debug = true
 	}
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -31,14 +35,21 @@ func (s *Server) RegisterRoutes() http.Handler {
 	api.GET("/", s.HelloWorldHandler)
 	api.GET("/health", s.healthHandler)
 
-	// authresp := e.Group("/auth")
-	// authresp.POST("/login", auth.Login)
-	// Add routes under /auth
-	api = auth.Setup(api)
-
+	auth.Setup(api)
+	if settings.ServerSettings.RunMode == "debug" {
+		e.GET("/swagger/*", echoSwagger.WrapHandler)
+	}
 	return e
 }
 
+// HelloWorldHandler godoc
+// @Summary Returns a hello world message
+// @Description Returns a hello world message
+// @Tags hello
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} map[string]string
+// @Router /api/ [get]
 func (s *Server) HelloWorldHandler(c echo.Context) error {
 	resp := map[string]string{
 		"message": "Hello World",

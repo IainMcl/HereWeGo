@@ -7,6 +7,7 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/server"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	"github.com/IainMcl/HereWeGo/internal/util"
+	_ "github.com/swaggo/echo-swagger/example/docs"
 )
 
 func init() {
@@ -15,8 +16,12 @@ func init() {
 	util.Setup()
 }
 
+// @title HereWeGo API
+// @description This is the API for the HereWeGo application.
+// @version 0.0.1
+// @host localhost:8080
+// @BasePath /api
 func main() {
-
 	logging.Info("Starting server...")
 	server := server.NewServer()
 

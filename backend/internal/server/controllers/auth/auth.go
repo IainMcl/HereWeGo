@@ -10,6 +10,11 @@ func Setup(e *echo.Group) *echo.Group {
 	return e
 }
 
+// @Summary Login
+// @Description Login
+// @Tags Auth
+// @Accept  json
+// @Produce  json
 func Login(c echo.Context) error {
 	return c.JSON(200, "login")
 }
