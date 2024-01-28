@@ -40,6 +40,10 @@ clean:
 	@echo "Cleaning..."
 	@rm -f main
 
+doc:
+	@echo "Generating Swagger docs..."
+	@swag init --parseDependency --parseInternal -g cmd/api/main.go
+
 # Live Reload
 watch:
 	@if command -v air > /dev/null; then \

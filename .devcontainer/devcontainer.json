@@ -24,7 +24,8 @@
 				"svelte.svelte-vscode",
 				"bradlc.vscode-tailwindcss",
 				"austenc.tailwind-docs",
-				"oven.bun-vscode"
+				"oven.bun-vscode",
+				"ms-vscode.makefile-tools"
 			]
 		}
 	},
