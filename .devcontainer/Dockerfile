@@ -20,13 +20,10 @@
 # First stage: use the Go image
 
 # Second stage: use the Bun image
-FROM ghcr.io/nhaef/devcontainer-bun:latest AS bun-stage
 
 FROM mcr.microsoft.com/devcontainers/go:1-1.21-bullseye 
 # Copy the Go binary from the first stage
-COPY --from=bun-stage /usr/local/bin /usr/local/bin
 
 # Add the Go bin directory to the PATH
-ENV PATH="/usr/local/bin:${PATH}"
 
 # TODO: Change this to just install bun rather thatn using the bun image
