@@ -7,7 +7,6 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/server"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	"github.com/IainMcl/HereWeGo/internal/util"
-	_ "github.com/swaggo/echo-swagger/example/docs"
 )
 
 func init() {

@@ -42,10 +42,13 @@ clean:
 
 doc:
 	@echo "Generating Swagger docs..."
-	@swag init --parseDependency --parseInternal -g cmd/api/main.go
+	@swag init -g cmd/api/main.go
 
 # Live Reload
 watch:
+	# @echo "Watching docs..."
+	# @swag init --parseDependency --parseInternal -g cmd/api/main.go -d docs
+
 	@if command -v air > /dev/null; then \
 	    air; \
 	    echo "Watching...";\
