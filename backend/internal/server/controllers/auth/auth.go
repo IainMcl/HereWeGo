@@ -1,7 +1,11 @@
 package auth
 
 import (
+	"net/http"
+
 	_ "github.com/IainMcl/HereWeGo/docs"
+	data "github.com/IainMcl/HereWeGo/internal/data/user"
+	models "github.com/IainMcl/HereWeGo/internal/models/user"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,21 +17,25 @@ func Setup(e *echo.Group) *echo.Group {
 	return e
 }
 
-type LoginRequest struct {
+type loginRequest struct {
 	UserName string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type LoginResponse struct {
+type loginResponse struct {
 	Token          string `json:"token"`
 	TokenExpiresAt string `json:"token_expires_at"`
 }
 
-type RegisterRequest struct {
+type registerRequest struct {
 	UserName string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type registerResponse struct {
+	UserName string `json:"username"`
 }
 
 // Login godoc
@@ -40,7 +48,7 @@ type RegisterRequest struct {
 // @Success 200 {object} LoginResponse
 // @Router /auth/login [post]
 func Login(c echo.Context) error {
-	return c.JSON(200, "login")
+	return c.JSON(http.StatusOK, "login")
 }
 
 // Register godoc
@@ -52,7 +60,15 @@ func Login(c echo.Context) error {
 // @Success 200
 // @Router /auth/register [post]
 func Register(c echo.Context) error {
-	return c.JSON(200, "register")
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid request")
+	}
+	err := data.CreateUser(user)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to create user")
+	}
+	return c.JSON(http.StatusOK, registerResponse{UserName: user.UserName})
 }
 
 // Logout godoc
@@ -62,5 +78,5 @@ func Register(c echo.Context) error {
 // @Success 200
 // @Router /auth/logout [post]
 func Logout(c echo.Context) error {
-	return c.JSON(200, "logout")
+	return c.JSON(http.StatusOK, "logout")
 }
