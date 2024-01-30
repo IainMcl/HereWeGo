@@ -16,3 +16,13 @@ Set up using
 ```bash
 bun create svelte@latest .
 ```
+
+
+## TODO
+
+On container set up
+
+* Install air for watch
+* Install go migrate `go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
+* Install echo-swagger `go install github.com/swaggo/swag/cmd/swag@latest`
+

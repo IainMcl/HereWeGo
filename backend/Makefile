@@ -65,3 +65,29 @@ watch:
 	fi
 
 .PHONY: all build run test clean
+
+CONNECTION_STRING=postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslmode=disable
+migrate-up:
+	@migrate -path db/migrations -database "$(CONNECTION_STRING)" up
+
+migrate-down:
+	@migrate -path db/migrations -database "$(CONNECTION_STRING)" down
+
+migrate-create:
+	@if [ -z "$(NAME)" ]; then \
+		read -p "Enter the name of the migration: " name; \
+	else \
+		name=$(NAME); \
+	fi; \
+	migrate create -ext sql -dir db/migrations -seq $$name
+
+migrate-version:
+	@migrate -path db/migrations -database "$(CONNECTION_STRING)" version
+
+migrate-force:
+	@migrate -path db/migrations -database "$(CONNECTION_STRING)" force $(VERSION)
+
+.PHONY: migrate-up migrate-down migrate-create migrate-version
+
+
+
