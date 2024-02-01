@@ -17,12 +17,29 @@ Set up using
 bun create svelte@latest .
 ```
 
+## Database
+
+Connecting to the dev container database 
+
+``` bash
+docker exec -it herewego_devcontainer-db-1 bash
+```
+
+Running `pqsl`
+
+```bash
+psql -U $POSTGRES_USER -d $POSTGRES_DB
+```
+
+The `POSTGRES_USER` and `POSTGRES_DB` will be created when the container is 
+created in the environment variables section.
+
 
 ## TODO
 
 On container set up
 
-* Install air for watch
+* Install air for watch `go install github.com/cosmtrek/air@latest`
 * Install go migrate `go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
 * Install echo-swagger `go install github.com/swaggo/swag/cmd/swag@latest`
 
