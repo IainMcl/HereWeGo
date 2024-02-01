@@ -36,7 +36,12 @@
 		5173
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "go version",
+	// "postCreateCommand": "go version",
+	"postCreateCommand": [
+		"go install github.com/cosmtrek/air@latest",
+		"go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest",
+		"go install github.com/swaggo/swag/cmd/swag@latest"
+	],
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "root",
 	"features": {

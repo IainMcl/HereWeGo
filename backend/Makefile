@@ -41,14 +41,16 @@ clean:
 	@rm -f main
 
 doc:
+	@if command - swag > /dev/null; then \
+		echo "Swag is already installed on your machine. Skipping..."; \
+	else \
+		go install github.com/swaggo/swag/cmd/swag@latest; \
+	fi
 	@echo "Generating Swagger docs..."
 	@swag init -g cmd/api/main.go
 
 # Live Reload
 watch:
-	# @echo "Watching docs..."
-	# @swag init --parseDependency --parseInternal -g cmd/api/main.go -d docs
-
 	@if command -v air > /dev/null; then \
 	    air; \
 	    echo "Watching...";\
@@ -64,9 +66,14 @@ watch:
 	    fi; \
 	fi
 
-.PHONY: all build run test clean
+.PHONY: all build run test clean doc
 
 CONNECTION_STRING=postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslmode=disable
+migrate-check:
+	@if ! command -v migrate &> /dev/null; then \
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
+    fi
+
 migrate-up:
 	@migrate -path db/migrations -database "$(CONNECTION_STRING)" up
 
@@ -87,7 +94,7 @@ migrate-version:
 migrate-force:
 	@migrate -path db/migrations -database "$(CONNECTION_STRING)" force $(VERSION)
 
-.PHONY: migrate-up migrate-down migrate-create migrate-version
+.PHONY: migrate-check migrate-up migrate-down migrate-create migrate-version migrate-force
 
 
 
