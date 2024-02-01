@@ -4,37 +4,39 @@ import (
 	"net/http"
 
 	_ "github.com/IainMcl/HereWeGo/docs"
-	data "github.com/IainMcl/HereWeGo/internal/data/user"
 	models "github.com/IainMcl/HereWeGo/internal/models/user"
+	"github.com/IainMcl/HereWeGo/internal/util"
 	"github.com/labstack/echo/v4"
 )
 
-func Setup(e *echo.Group) *echo.Group {
-	// Add routes under /auth
-	auth := e.Group("/auth")
-	auth.POST("/login", Login)
-	auth.POST("/register", Register)
-	return e
+func Setup(a, r *echo.Group) (*echo.Group, *echo.Group) {
+	// Add restricted routes under /auth
+	authRes := r.Group("/auth")
+	// Add anonymous routes under /auth
+	authAnon := a.Group("/auth")
+	authAnon.POST("/login", Login)
+	authAnon.POST("/register", Register)
+	authRes.POST("/logout", Logout)
+	return authAnon, authRes
 }
 
-type loginRequest struct {
+type LoginRequest struct {
 	UserName string `json:"username"`
-	Email    string `json:"email"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
-type loginResponse struct {
-	Token          string `json:"token"`
-	TokenExpiresAt string `json:"token_expires_at"`
+type LoginResponse struct {
+	Token string `json:"token"`
 }
 
-type registerRequest struct {
+type RegisterRequest struct {
 	UserName string `json:"username"`
-	Email    string `json:"email"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
-type registerResponse struct {
+type RegisterResponse struct {
 	UserName string `json:"username"`
 }
 
@@ -48,7 +50,26 @@ type registerResponse struct {
 // @Success 200 {object} LoginResponse
 // @Router /auth/login [post]
 func Login(c echo.Context) error {
-	return c.JSON(http.StatusOK, "login")
+	var req LoginRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid request")
+	}
+
+	if req.Email == "" || req.Password == "" {
+		return c.JSON(http.StatusBadRequest, "Invalid request:  email and password required")
+	}
+
+	u, err := models.AuthenticateUser(req.Email, req.Password)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "Invalid credentials")
+	}
+
+	token, err := util.GenerateToken(u.Username, u.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to generate token")
+	}
+
+	return c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
 
 // Register godoc
@@ -64,11 +85,13 @@ func Register(c echo.Context) error {
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid request")
 	}
-	err := data.CreateUser(user)
+
+	err := user.CreateUser()
+
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "Failed to create user")
 	}
-	return c.JSON(http.StatusOK, registerResponse{UserName: user.UserName})
+	return c.JSON(http.StatusOK, RegisterResponse{UserName: user.Username})
 }
 
 // Logout godoc

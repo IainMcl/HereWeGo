@@ -1,50 +1,42 @@
 package util
 
-// import (
-// 	"time"
+import (
+	"time"
 
-// 	"github.com/dgrijalva/jwt-go"
-// )
+	"github.com/IainMcl/HereWeGo/internal/settings"
+	"github.com/golang-jwt/jwt/v5"
+)
 
-// var jwtSecret []byte
+var JwtSecret []byte
 
-// type Claims struct {
-// 	Username string `json:"username"`
-// 	Password string `json:"password"`
-// 	jwt.StandardClaims
+type Claims struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+// func (c Claims) Valid() error {
+// 	// TODO: Add more validation
+// 	return nil
 // }
 
-// // GenerateToken generate tokens used for auth
-// func GenerateToken(username, password string) (string, error) {
-// 	nowTime := time.Now()
-// 	expireTime := nowTime.Add(3 * time.Hour)
+func GenerateToken(username, email string) (string, error) {
+	// Set custom claims
+	claims := &Claims{
+		username,
+		email,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(settings.AppSettings.JwtDurationHours))),
+		},
+	}
 
-// 	claims := Claims{
-// 		EncodeMD5(username),
-// 		EncodeMD5(password),
-// 		jwt.StandardClaims{
-// 			ExpiresAt: expireTime.Unix(),
-// 			Issuer:    "here-we-go",
-// 		},
-// 	}
+	// Create token with claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-// 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-// 	token, err := tokenClaims.SignedString(jwtSecret)
-
-// 	return token, err
-// }
-
-// // ParseToken parsing token
-// func ParseToken(token string) (*Claims, error) {
-// 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-// 		return jwtSecret, nil
-// 	})
-
-// 	if tokenClaims != nil {
-// 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-// 			return claims, nil
-// 		}
-// 	}
-
-// 	return nil, err
-// }
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString(JwtSecret)
+	if err != nil {
+		return "", err
+	}
+	return t, nil
+}

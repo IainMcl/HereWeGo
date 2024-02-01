@@ -11,9 +11,9 @@ definitions:
     type: object
   auth.LoginResponse:
     properties:
-      token:
+      expires_at:
         type: string
-      token_expires_at:
+      token:
         type: string
     type: object
   auth.RegisterRequest:

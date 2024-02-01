@@ -1,5 +1,7 @@
 package util
 
+import "github.com/IainMcl/HereWeGo/internal/settings"
+
 func Setup() {
-	// jwtSecret = []byte(settings.AppSettings.JwtSecret)
+	JwtSecret = []byte(settings.AppSettings.JwtSecret)
 }
