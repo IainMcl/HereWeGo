@@ -9,7 +9,8 @@ import (
 )
 
 type App struct {
-	JwtSecret string
+	JwtSecret        string
+	JwtDurationHours int
 
 	RuntimeRootPath string
 

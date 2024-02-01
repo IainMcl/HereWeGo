@@ -1,12 +1,16 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/server/controllers/auth"
 	"github.com/IainMcl/HereWeGo/internal/settings"
+	"github.com/IainMcl/HereWeGo/internal/util"
+	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/joho/godotenv/autoload"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -32,11 +36,27 @@ func (s *Server) RegisterRoutes() http.Handler {
 		}))
 	}
 
-	api := e.Group("/api")
-	api.GET("/", s.HelloWorldHandler)
-	api.GET("/health", s.healthHandler)
+	// Restricted routes
+	r := e.Group("/api")
+	config := echojwt.Config{
+		SigningKey: util.JwtSecret,
+	}
+	r.Use(echojwt.WithConfig(config))
 
-	auth.Setup(api)
+	r.GET("/test", func(c echo.Context) error {
+		// Get the claims from the jwt
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(jwt.MapClaims) // Use jwt.MapClaims
+		name := claims["name"].(string)       // Access the "name" field from jwt.MapClaims
+		return c.String(http.StatusOK, fmt.Sprintf("Welcome %s!", name))
+	})
+
+	// Anonymous routes
+	a := e.Group("/api")
+	a.GET("/", s.HelloWorldHandler)
+	a.GET("/health", s.healthHandler)
+
+	auth.Setup(a, r)
 	if settings.ServerSettings.RunMode == "debug" {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
 	}
