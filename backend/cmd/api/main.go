@@ -15,11 +15,11 @@ func init() {
 	util.Setup()
 }
 
-// @title HereWeGo API
-// @description This is the API for the HereWeGo application.
-// @version 0.0.1
-// @host localhost:8080
-// @BasePath /api
+//	@title			HereWeGo API
+//	@description	This is the API for the HereWeGo application.
+//	@version		0.0.1
+//	@host			localhost:8080
+//	@BasePath		/api
 func main() {
 	logging.Info("Starting server...")
 	server := server.NewServer()

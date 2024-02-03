@@ -64,13 +64,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 // HelloWorldHandler godoc
-// @Summary Returns a hello world message
-// @Description Returns a hello world message
-// @Tags System
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} map[string]string
-// @Router / [get]
+//	@Summary		Returns a hello world message
+//	@Description	Returns a hello world message
+//	@Tags			System
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Router			/ [get]
 func (s *Server) HelloWorldHandler(c echo.Context) error {
 	resp := map[string]string{
 		"message": "Hello World",
@@ -80,12 +80,12 @@ func (s *Server) HelloWorldHandler(c echo.Context) error {
 }
 
 // HealthHandler godoc
-// @Summary Returns the health of the database server
-// @Description Returns the health of the database server
-// @Tags System
-// @Produce  json
-// @Success 200 {object} map[string]string
-// @Router /health [get]
+//	@Summary		Returns the health of the database server
+//	@Description	Returns the health of the database server
+//	@Tags			System
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Router			/health [get]
 func (s *Server) healthHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, s.db.Health())
 }
