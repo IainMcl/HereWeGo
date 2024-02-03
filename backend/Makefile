@@ -47,6 +47,7 @@ doc:
 		go install github.com/swaggo/swag/cmd/swag@latest; \
 	fi
 	@echo "Generating Swagger docs..."
+	@swag fmt cmd/api/main.go
 	@swag init -g cmd/api/main.go
 
 # Live Reload

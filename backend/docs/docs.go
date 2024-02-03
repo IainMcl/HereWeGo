@@ -159,9 +159,6 @@ const docTemplate = `{
         "auth.LoginResponse": {
             "type": "object",
             "properties": {
-                "expires_at": {
-                    "type": "string"
-                },
                 "token": {
                     "type": "string"
                 }

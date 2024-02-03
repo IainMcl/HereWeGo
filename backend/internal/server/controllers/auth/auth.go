@@ -41,14 +41,14 @@ type RegisterResponse struct {
 }
 
 // Login godoc
-// @Summary Login
-// @Description Login
-// @Tags Auth
-// @Accept json
-// @Param body body LoginRequest true "Login Request"
-// @Produce json
-// @Success 200 {object} LoginResponse
-// @Router /auth/login [post]
+//	@Summary		Login
+//	@Description	Login
+//	@Tags			Auth
+//	@Accept			json
+//	@Param			body	body	LoginRequest	true	"Login Request"
+//	@Produce		json
+//	@Success		200	{object}	LoginResponse
+//	@Router			/auth/login [post]
 func Login(c echo.Context) error {
 	var req LoginRequest
 	if err := c.Bind(&req); err != nil {
@@ -73,13 +73,13 @@ func Login(c echo.Context) error {
 }
 
 // Register godoc
-// @Summary Register
-// @Description Register
-// @Tags Auth
-// @Accept json
-// @Param body body RegisterRequest true "Register Request"
-// @Success 200
-// @Router /auth/register [post]
+//	@Summary		Register
+//	@Description	Register
+//	@Tags			Auth
+//	@Accept			json
+//	@Param			body	body	RegisterRequest	true	"Register Request"
+//	@Success		200
+//	@Router			/auth/register [post]
 func Register(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {
@@ -95,11 +95,11 @@ func Register(c echo.Context) error {
 }
 
 // Logout godoc
-// @Summary Logout
-// @Description Logout
-// @Tags Auth
-// @Success 200
-// @Router /auth/logout [post]
+//	@Summary		Logout
+//	@Description	Logout
+//	@Tags			Auth
+//	@Success		200
+//	@Router			/auth/logout [post]
 func Logout(c echo.Context) error {
 	return c.JSON(http.StatusOK, "logout")
 }
