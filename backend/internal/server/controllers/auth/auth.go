@@ -21,7 +21,6 @@ func Setup(a, r *echo.Group) (*echo.Group, *echo.Group) {
 }
 
 type LoginRequest struct {
-	UserName string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
 }
@@ -41,6 +40,7 @@ type RegisterResponse struct {
 }
 
 // Login godoc
+//
 //	@Summary		Login
 //	@Description	Login
 //	@Tags			Auth
@@ -52,27 +52,28 @@ type RegisterResponse struct {
 func Login(c echo.Context) error {
 	var req LoginRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid request")
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 
 	if req.Email == "" || req.Password == "" {
-		return c.JSON(http.StatusBadRequest, "Invalid request:  email and password required")
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Email and password are required"})
 	}
 
 	u, err := models.AuthenticateUser(req.Email, req.Password)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, "Invalid credentials")
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid email or password"})
 	}
 
 	token, err := util.GenerateToken(u.Username, u.Email)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to generate token")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
 
 	return c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
 
 // Register godoc
+//
 //	@Summary		Register
 //	@Description	Register
 //	@Tags			Auth
@@ -83,23 +84,28 @@ func Login(c echo.Context) error {
 func Register(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid request")
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 
 	err := user.CreateUser()
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to create user")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user"})
 	}
 	return c.JSON(http.StatusOK, RegisterResponse{UserName: user.Username})
 }
 
 // Logout godoc
+//
 //	@Summary		Logout
 //	@Description	Logout
 //	@Tags			Auth
 //	@Success		200
+//	@Security		ApiKeyAuth
 //	@Router			/auth/logout [post]
 func Logout(c echo.Context) error {
-	return c.JSON(http.StatusOK, "logout")
+	// Add token to invalid list
+	token := c.Request().Header.Get("Authorization")[7:]
+	util.AddBlacklist(token)
+	return c.JSON(http.StatusOK, map[string]string{"message": "Logged out"})
 }
