@@ -14,10 +14,12 @@ type App struct {
 
 	RuntimeRootPath string
 
-	LogSavePath string
-	LogSaveName string
-	LogFileExt  string
-	TimeFormat  string
+	LogLevel     string
+	LogToConsole bool
+	LogSavePath  string
+	LogSaveName  string
+	LogFileExt   string
+	TimeFormat   string
 
 	EnableCors bool
 }

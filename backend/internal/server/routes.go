@@ -1,14 +1,13 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/IainMcl/HereWeGo/internal/logging"
+	custommiddleware "github.com/IainMcl/HereWeGo/internal/middleware"
 	"github.com/IainMcl/HereWeGo/internal/server/controllers/auth"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	"github.com/IainMcl/HereWeGo/internal/util"
-	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/joho/godotenv/autoload"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -41,20 +40,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 	config := echojwt.Config{
 		SigningKey: util.JwtSecret,
 	}
-	r.Use(echojwt.WithConfig(config))
+	r.Use(custommiddleware.JWTWithInvalidationCheck)
 
-	r.GET("/test", func(c echo.Context) error {
-		// Get the claims from the jwt
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(jwt.MapClaims) // Use jwt.MapClaims
-		name := claims["name"].(string)       // Access the "name" field from jwt.MapClaims
-		return c.String(http.StatusOK, fmt.Sprintf("Welcome %s!", name))
-	})
+	r.GET("/health", s.healthHandler)
+	r.Use(echojwt.WithConfig(config))
 
 	// Anonymous routes
 	a := e.Group("/api")
-	a.GET("/", s.HelloWorldHandler)
-	a.GET("/health", s.healthHandler)
+	a.GET("/ping", s.ping)
 
 	auth.Setup(a, r)
 	if settings.ServerSettings.RunMode == "debug" {
@@ -63,29 +56,28 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return e
 }
 
-// HelloWorldHandler godoc
-//	@Summary		Returns a hello world message
-//	@Description	Returns a hello world message
-//	@Tags			System
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{object}	map[string]string
-//	@Router			/ [get]
-func (s *Server) HelloWorldHandler(c echo.Context) error {
-	resp := map[string]string{
-		"message": "Hello World",
-	}
-
-	return c.JSON(http.StatusOK, resp)
-}
-
 // HealthHandler godoc
+//
 //	@Summary		Returns the health of the database server
 //	@Description	Returns the health of the database server
 //	@Tags			System
 //	@Produce		json
 //	@Success		200	{object}	map[string]string
+//	@Security		ApiKeyAuth
 //	@Router			/health [get]
 func (s *Server) healthHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, s.db.Health())
+}
+
+// Ping godoc
+//
+//	@Summary		Ping
+//	@Description	Ping
+//	@Tags			System
+//	@Produce		json
+//	@Success		200
+//	@Router			/ping [get]
+func (s *Server) ping(c echo.Context) error {
+	logging.Debug("ping")
+	return c.String(http.StatusOK, "pong")
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/IainMcl/HereWeGo/internal/database"
+	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/services"
 )
 
@@ -60,6 +61,7 @@ func AuthenticateUser(email, password string) (User, error) {
 		WHERE email = $1
 		`, email)
 	if err != nil {
+		logging.Warn("Error getting user from db: ", err)
 		return u, err
 	}
 	if !services.CheckPasswordHash(password, u.Password) {
