@@ -49,7 +49,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	a := e.Group("/api")
 	a.GET("/ping", s.ping)
 
-	auth.Setup(a, r)
+	auth.Setup(s.db.Db(), a, r)
 	if settings.ServerSettings.RunMode == "debug" {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
 	}
