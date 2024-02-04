@@ -6,10 +6,14 @@ import (
 	_ "github.com/IainMcl/HereWeGo/docs"
 	models "github.com/IainMcl/HereWeGo/internal/models/user"
 	"github.com/IainMcl/HereWeGo/internal/util"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
-func Setup(a, r *echo.Group) (*echo.Group, *echo.Group) {
+var db *sqlx.DB
+
+func Setup(d *sqlx.DB, a, r *echo.Group) (*echo.Group, *echo.Group) {
+	db = d
 	// Add restricted routes under /auth
 	authRes := r.Group("/auth")
 	// Add anonymous routes under /auth
@@ -39,6 +43,11 @@ type RegisterResponse struct {
 	UserName string `json:"username"`
 }
 
+type ResetPasswordRequest struct {
+	Email       string `json:"email"`
+	NewPassword string `json:"new_password"`
+}
+
 // Login godoc
 //
 //	@Summary		Login
@@ -59,7 +68,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Email and password are required"})
 	}
 
-	u, err := models.AuthenticateUser(req.Email, req.Password)
+	u, err := models.AuthenticateUser(db, req.Email, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid email or password"})
 	}
@@ -87,7 +96,7 @@ func Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 
-	err := user.CreateUser()
+	err := user.CreateUser(db)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user"})
@@ -108,4 +117,30 @@ func Logout(c echo.Context) error {
 	token := c.Request().Header.Get("Authorization")[7:]
 	util.AddBlacklist(token)
 	return c.JSON(http.StatusOK, map[string]string{"message": "Logged out"})
+}
+
+// ResetPassword godoc
+//
+//	@Summary		Reset Password
+//	@Description	Reset Password
+//	@Tags			Auth
+//	@Accept			json
+//	@Param			body	body	ResetPasswordRequest	true	"Reset Password Request"
+//	@Success		200
+//	@Router			/auth/resetpassword [post]
+func ResetPassword(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{"message": "Reset password"})
+}
+
+// SendResetPasswordEmail godoc
+//
+//	@Summary		Send Reset Password Email
+//	@Description	Send Reset Password Email to the provided email if it exists
+//	@Tags			Auth
+//	@Accept			json
+//	@Param			email	query	string	true	"Email to send reset password email to"
+//	@Success		200
+//	@Router			/auth/sendresetpasswordemail [get]
+func SendResetPasswordEmail(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{"message": "Send reset password email"})
 }

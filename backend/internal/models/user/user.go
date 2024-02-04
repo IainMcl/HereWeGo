@@ -6,6 +6,7 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/database"
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/services"
+	"github.com/jmoiron/sqlx"
 )
 
 type UserRole int
@@ -23,7 +24,7 @@ type User struct {
 	Role     string `json:"role" db:"role"`
 }
 
-func (u *User) CreateUser() error {
+func (u *User) CreateUser(db *sqlx.DB) error {
 	p, err := services.HashPassword(u.Password)
 	if err != nil {
 		return err
@@ -32,15 +33,14 @@ func (u *User) CreateUser() error {
 	if !services.ValidateEmail(u.Email) {
 		return errors.New("invalid email")
 	}
-	if err := u.addUserToDb(); err != nil {
+	if err := u.addUserToDb(db); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *User) addUserToDb() error {
-	s := database.New().Db()
-	tx := s.MustBegin()
+func (u *User) addUserToDb(db *sqlx.DB) error {
+	tx := db.MustBegin()
 	tx.MustExec(`
 		INSERT INTO users 
 			(username, email, password) 
@@ -51,7 +51,7 @@ func (u *User) addUserToDb() error {
 	return nil
 }
 
-func AuthenticateUser(email, password string) (User, error) {
+func AuthenticateUser(db *sqlx.DB, email, password string) (User, error) {
 	var u User
 	s := database.New().Db()
 	err := s.Get(&u, `
