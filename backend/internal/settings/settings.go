@@ -14,12 +14,13 @@ type App struct {
 
 	RuntimeRootPath string
 
-	LogLevel     string
-	LogToConsole bool
-	LogSavePath  string
-	LogSaveName  string
-	LogFileExt   string
-	TimeFormat   string
+	LogLevel           string
+	LogToConsole       bool
+	LogSavePath        string
+	LogSaveName        string
+	LogFileExt         string
+	TimeFormat         string
+	UserDateTimeFormat string
 
 	EnableCors bool
 }
@@ -45,6 +46,22 @@ type Database struct {
 
 var DatabaseSettings = &Database{}
 
+type Mail struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+}
+
+var MailSettings = &Mail{}
+
+type OTP struct {
+	ExpirationMinutes int
+	Length            int
+}
+
+var OTPSettings = &OTP{}
+
 var cfg *ini.File
 
 func Setup() {
@@ -57,6 +74,8 @@ func Setup() {
 	mapTo("app", AppSettings)
 	mapTo("server", ServerSettings)
 	mapTo("database", DatabaseSettings)
+	mapTo("mail", MailSettings)
+	mapTo("otp", OTPSettings)
 
 	AppSettings.LogSavePath = fmt.Sprintf("%s%s", AppSettings.RuntimeRootPath, AppSettings.LogSavePath)
 }

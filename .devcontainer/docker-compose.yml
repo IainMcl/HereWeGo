@@ -37,6 +37,7 @@ services:
       POSTGRES_USER: iainm
       POSTGRES_PASSWORD: password1234
       POSTGRES_DB: herewego
+      POSTGRES_MULTIPLE_EXTENSIONS: pg_cron
 
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
