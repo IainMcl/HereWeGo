@@ -21,6 +21,15 @@ definitions:
       username:
         type: string
     type: object
+  auth.ResetPasswordRequest:
+    properties:
+      email:
+        type: string
+      new_password:
+        type: string
+      token:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -77,6 +86,41 @@ paths:
         "200":
           description: OK
       summary: Register
+      tags:
+      - Auth
+  /auth/resetpassword:
+    post:
+      consumes:
+      - application/json
+      description: Reset Password
+      parameters:
+      - description: Reset Password Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ResetPasswordRequest'
+      responses:
+        "200":
+          description: OK
+      summary: Reset Password
+      tags:
+      - Auth
+  /auth/sendresetpasswordemail:
+    get:
+      consumes:
+      - application/json
+      description: Send Reset Password Email to the provided email if it exists
+      parameters:
+      - description: Email to send reset password email to
+        in: query
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Send Reset Password Email
       tags:
       - Auth
   /health:
