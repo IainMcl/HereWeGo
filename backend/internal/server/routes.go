@@ -28,7 +28,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e.Use(middleware.Recover())
 
 	enableCors := settings.AppSettings.EnableCors
-	if enableCors {
+	if !enableCors {
+		// CORS restricted with a custom function to allow origins
+		// and with the GET, PUT, POST or DELETE methods allowed.
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOriginFunc: allowOrigin,
+			AllowMethods:    []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+		}))
+	} else {
 		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins: []string{"*"},
 			AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
@@ -80,4 +87,15 @@ func (s *Server) healthHandler(c echo.Context) error {
 func (s *Server) ping(c echo.Context) error {
 	logging.Debug("ping")
 	return c.String(http.StatusOK, "pong")
+}
+
+// allowOrigin is a custom function to allow origins
+// based on the settings in the config file.
+func allowOrigin(origin string) (bool, error) {
+	for _, o := range settings.AppSettings.CorsOrigins {
+		if o == origin {
+			return true, nil
+		}
+	}
+	return false, nil
 }

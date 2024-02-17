@@ -31,7 +31,7 @@ func SendResetPasswordEmail(email, username string, userId int64, token util.OTP
 		"name":        username,
 		"token":       token.Token,
 		"userID":      userId,
-		"frontendURL": "https://google.com",
+		"frontendURL": "https://google.com", // TODO: Change this to the frontend URL
 		"expiration":  token.ExpirationMinutes,
 		"exact":       expiresAt,
 	}

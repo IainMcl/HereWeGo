@@ -22,7 +22,8 @@ type App struct {
 	TimeFormat         string
 	UserDateTimeFormat string
 
-	EnableCors bool
+	EnableCors  bool
+	CorsOrigins []string
 }
 
 var AppSettings = &App{}

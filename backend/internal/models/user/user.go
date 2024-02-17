@@ -6,6 +6,7 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/database"
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/services"
+	"github.com/IainMcl/HereWeGo/internal/util"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -44,7 +45,7 @@ func (u *User) addUserToDb(db *sqlx.DB) error {
 	tx.MustExec(`
 		INSERT INTO users 
 			(username, email, password) 
-			VALUES ($1, $2, $3)
+			VALUES ($1, $2, $3);
 			`, u.Username, u.Email, u.Password)
 
 	tx.Commit()
@@ -69,7 +70,7 @@ func (u *User) UpdateUser(db *sqlx.DB) error {
 	tx.MustExec(`
 		UPDATE users 
 		SET username = $1, email = $2, password = $3
-		WHERE id = $4
+		WHERE id = $4;
 		`, u.Username, u.Email, u.Password, u.ID)
 	tx.Commit()
 	return nil
@@ -82,7 +83,7 @@ func AuthenticateUser(db *sqlx.DB, email, password string) (User, error) {
 		SELECT 
 			id, username, email, password, role
 		FROM users 
-		WHERE email = $1
+		WHERE email = $1;
 		`, email)
 	if err != nil {
 		logging.Warn("Error getting user from db: ", err)
@@ -101,11 +102,32 @@ func GetUserByEmail(db *sqlx.DB, email string) (User, error) {
 		SELECT 
 			id, username, email, password, role
 		FROM users 
-		WHERE email = $1
+		WHERE email = $1;
 		`, email)
 	if err != nil {
 		logging.Warn("Error getting user from db: ", err)
 		return u, err
 	}
 	return u, nil
+}
+
+func GetUserFromToken(db *sqlx.DB, token string) (*User, error) {
+	claims, err := util.ClaimsFromToken(token)
+	if err != nil {
+		return nil, err
+	}
+
+	var u User
+	err = db.Get(&u, `
+		SELECT
+			id, username, email, role
+		FROM users 
+		WHERE
+			id = $1;`, claims.UserId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }

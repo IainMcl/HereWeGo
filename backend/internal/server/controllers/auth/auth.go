@@ -21,6 +21,7 @@ func Setup(d *sqlx.DB, a, r *echo.Group) (*echo.Group, *echo.Group) {
 	// Add anonymous routes under /auth
 	authAnon := a.Group("/auth")
 	authAnon.POST("/login", Login)
+	authRes.GET("/username", Username)
 	authAnon.POST("/register", Register)
 	authRes.POST("/logout", Logout)
 	authAnon.GET("/sendresetpasswordemail", SendResetPasswordEmail)
@@ -78,12 +79,30 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid email or password"})
 	}
 
-	token, err := util.GenerateToken(u.Username, u.Email)
+	token, err := util.GenerateToken(u.Username, u.Email, u.ID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
 
 	return c.JSON(http.StatusOK, LoginResponse{Token: token})
+}
+
+// Username godoc
+//
+//	@Summary		Get Username
+//	@Description	Get Username as an authentication check for the logged in user
+//	@Tags			Auth
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Security		ApiKeyAuth
+//	@Router			/auth/username [get]
+func Username(c echo.Context) error {
+	token := c.Request().Header.Get("Authorization")
+	user, err := models.GetUserFromToken(db, token)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token"})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"username": user.Username})
 }
 
 // Register godoc
