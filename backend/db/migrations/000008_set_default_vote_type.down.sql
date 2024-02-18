@@ -1,0 +1,1 @@
+ALTER TABLE votes ALTER COLUMN vote_type DROP DEFAULT;

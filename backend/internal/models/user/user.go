@@ -128,6 +128,5 @@ func GetUserFromToken(db *sqlx.DB, token string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &u, nil
 }

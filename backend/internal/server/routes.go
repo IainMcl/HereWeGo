@@ -6,6 +6,7 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	custommiddleware "github.com/IainMcl/HereWeGo/internal/middleware"
 	"github.com/IainMcl/HereWeGo/internal/server/controllers/auth"
+	"github.com/IainMcl/HereWeGo/internal/server/controllers/polls"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	"github.com/IainMcl/HereWeGo/internal/util"
 	_ "github.com/joho/godotenv/autoload"
@@ -57,6 +58,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	a.GET("/ping", s.ping)
 
 	auth.Setup(s.db.Db(), a, r)
+	polls.Setup(s.db.Db(), a, r)
 	if settings.ServerSettings.RunMode == "debug" {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
 	}
