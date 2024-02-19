@@ -17,5 +17,4 @@
 </svelte:head>
 
 <section>
-	<Button on:click={test}>Hello {resp}</Button>
 </section>

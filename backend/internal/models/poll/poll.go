@@ -155,6 +155,26 @@ func (po *NamedPollOption) VoteFor(db *sqlx.DB, userId int64) error {
 	return nil
 }
 
+func VoteFor(db *sqlx.DB, userId, pollOptionId int64) error {
+	tx := db.MustBegin()
+	tx.MustExec(`
+		INSERT INTO votes (user_id, poll_option_id) VALUES ($1, $2);
+		`, userId, pollOptionId)
+
+	tx.Commit()
+	return nil
+}
+
+func RemoveVote(db *sqlx.DB, userId, pollOptionId int64) error {
+	tx := db.MustBegin()
+	tx.MustExec(`
+		DELETE FROM votes WHERE user_id = $1 AND poll_option_id = $2;
+		`, userId, pollOptionId)
+
+	tx.Commit()
+	return nil
+}
+
 func (po *NamedPollOption) VoteAgainst(db *sqlx.DB, userId int64) error {
 	tx := db.MustBegin()
 	tx.MustExec(`

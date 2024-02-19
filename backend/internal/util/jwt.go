@@ -9,6 +9,7 @@ import (
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	"github.com/IainMcl/HereWeGo/internal/settings"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 )
 
 var JwtSecret []byte
@@ -128,4 +129,12 @@ func ClaimsFromToken(tokenString string) (Claims, error) {
 	}
 
 	return Claims{}, fmt.Errorf("error parsing claims")
+}
+
+func GetUserId(c echo.Context) (int64, error) {
+	user, err := ClaimsFromToken(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		return 0, err
+	}
+	return user.UserId, nil
 }
