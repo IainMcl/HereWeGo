@@ -46,6 +46,7 @@ type RegisterRequest struct {
 
 type RegisterResponse struct {
 	UserName string `json:"username"`
+	Email    string `json:"email"`
 }
 
 type ResetPasswordRequest struct {
@@ -125,7 +126,7 @@ func Register(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user"})
 	}
-	return c.JSON(http.StatusOK, RegisterResponse{UserName: user.Username})
+	return c.JSON(http.StatusCreated, RegisterResponse{UserName: user.Username, Email: user.Email})
 }
 
 // Logout godoc
