@@ -17,6 +17,12 @@
             "cwd": "${workspaceFolder}/backend/",
             "env": {},
             "args": []
-        }
+        },
+        // {
+        //     "name": "Svelte server",
+        //     "command": "bun vavite-loader vite dev --port 3000",
+        //     "request": "launch",
+        //     "type": "node-terminal"
+        // }
     ]
 }

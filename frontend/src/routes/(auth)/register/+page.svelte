@@ -41,9 +41,6 @@
                 </span>
             </div>
         </div>
-        <RegisterForm data={data.form} />
+        <RegisterForm {data} />
     </Card.Content>
-    <Card.Footer>
-        <Button class="w-full">Create account</Button>
-    </Card.Footer>
 </Card.Root>

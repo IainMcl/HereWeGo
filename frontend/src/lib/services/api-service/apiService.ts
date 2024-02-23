@@ -5,7 +5,7 @@
  * @param data Data to be sent to the API endpoint
  * @returns JSON response from the API endpoint
  */
-export async function request(url: string, method: string = 'GET', data: any = null): Promise<any> {
+export async function request(method: string = 'GET', url: string, data: any = null): Promise<any> {
     const apiRoot = import.meta.env.VITE_API_ROOT;
     const fullUrl = apiRoot + url;
     const options: RequestInit = {
@@ -29,7 +29,7 @@ export async function request(url: string, method: string = 'GET', data: any = n
     return await response.json();
 }
 
-export async function unauthenticatedRequest(url: string, method: string = 'GET', data: any = null): Promise<any> {
+export async function unauthenticatedRequest(method: string = 'GET', url: string, data: any = null): Promise<any> {
     const apiRoot = import.meta.env.VITE_API_ROOT;
     const fullUrl = apiRoot + url;
     const options: RequestInit = {
@@ -42,8 +42,9 @@ export async function unauthenticatedRequest(url: string, method: string = 'GET'
     if (data) {
         options.body = JSON.stringify(data);
     }
-
+    console.log(fullUrl, options);
     const response = await fetch(fullUrl, options);
+    console.log(response);
     if (!response.ok) {
         throw new Error(`HTTP error: status: ${response.status}`);
     } else if (response.status === 204) {

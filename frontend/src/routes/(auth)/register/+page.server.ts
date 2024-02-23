@@ -12,16 +12,23 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions: Actions = {
-    default: async (event) => {
-        const form = await superValidate(event, zod(registerFormSchema));
+    register: async ({ request }) => {
+        console.log("register action called")
+        // console.log(request);
+        // const form = await request.formData();
+        const form = await superValidate(request, zod(registerFormSchema));
+        // console.log(form);
         if (!form.valid) {
+            console.log("form not valid")
             return fail(400, {
                 form,
             });
         }
 
+        // let email = form.get('email');
+        // let password = form.get('password');
         const { email, password } = form.data;
-        const response = await unauthenticatedRequest('POST', 'auth/register', {
+        const response = await unauthenticatedRequest('POST', '/auth/register', {
             email,
             password,
         });
@@ -32,7 +39,7 @@ export const actions: Actions = {
                 return {
                     status: 201,
                     headers: {
-                        'set-cookie': response.headers.get('set-cookie'),
+                        // 'set-cookie': response.headers.get('set-cookie'),
                     },
                     form
                 };
