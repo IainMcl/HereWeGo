@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 
 	_ "github.com/IainMcl/HereWeGo/docs"
@@ -8,6 +9,7 @@ import (
 	models "github.com/IainMcl/HereWeGo/internal/models/user"
 	"github.com/IainMcl/HereWeGo/internal/services"
 	"github.com/IainMcl/HereWeGo/internal/util"
+	"github.com/jackc/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
@@ -122,6 +124,14 @@ func Register(c echo.Context) error {
 	}
 
 	err := user.CreateUser(db)
+
+	// TODO: This isn't catching the error even thought it is a pgconn.PgError
+
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		// err is a pgconn.PgError, handle it
+		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already in use"})
+	}
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user"})

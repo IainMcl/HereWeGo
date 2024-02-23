@@ -42,13 +42,23 @@ func (u *User) CreateUser(db *sqlx.DB) error {
 
 func (u *User) addUserToDb(db *sqlx.DB) error {
 	tx := db.MustBegin()
-	tx.MustExec(`
+	_, err := tx.Exec(`
 		INSERT INTO users 
 			(username, email, password) 
 			VALUES ($1, $2, $3);
 			`, u.Username, u.Email, u.Password)
 
-	tx.Commit()
+	if err != nil {
+		logging.Warn("Error adding user to db: ", err)
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		logging.Warn("Error committing transaction: ", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -67,12 +77,22 @@ func (u *User) UpdatePassword(db *sqlx.DB, password string) error {
 
 func (u *User) UpdateUser(db *sqlx.DB) error {
 	tx := db.MustBegin()
-	tx.MustExec(`
+	_, err := tx.Exec(`
 		UPDATE users 
 		SET username = $1, email = $2, password = $3
 		WHERE id = $4;
 		`, u.Username, u.Email, u.Password, u.ID)
-	tx.Commit()
+	if err != nil {
+		logging.Warn("Error updating user in db: ", err)
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		logging.Warn("Error committing transaction: ", err)
+		return err
+	}
 	return nil
 }
 
