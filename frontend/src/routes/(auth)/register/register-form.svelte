@@ -14,16 +14,20 @@
     } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
 
-    export let data: { form: SuperValidated<RegisterFormSchema> };
-    const form = superForm(data.form, {
+    export let data: {
+        form: SuperValidated<RegisterFormSchema>;
+    };
+    const registerForm = superForm(data.form, {
         validators: zodClient(registerFormSchema),
         multipleSubmits: "prevent",
     });
 
-    const { form: formData, errors, enhance } = form;
+    export let form: any;
+
+    const { form: formData, errors, enhance } = registerForm;
 </script>
 
-<form method="POST" action="?/register">
+<form method="POST" action="?/register" use:enhance>
     <div class="form-sections flex gap-4 flex-col">
         <div class="form-input flex flex-col gap-2">
             <Label for="email">Email</Label>
@@ -43,6 +47,11 @@
                     >{$errors.password}</span
                 >{/if}
         </div>
+        {#if form?.status === 409}
+            <p class="text-red-600">
+                User already exists <a href="#">log in?</a>
+            </p>
+        {/if}
         <Button on:click|once type="submit" class="w-full"
             >Create account</Button
         >

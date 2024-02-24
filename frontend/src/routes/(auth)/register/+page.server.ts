@@ -7,7 +7,8 @@ import { unauthenticatedRequest } from '@/services/api-service/apiService';
 
 export const load: PageServerLoad = async () => {
     return {
-        form: await superValidate(zod(registerFormSchema))
+        form: await superValidate(zod(registerFormSchema)),
+        status: 200,
     };
 }
 
@@ -33,7 +34,6 @@ export const actions: Actions = {
             password,
         });
 
-        console.log(response);
         switch (response.status) {
             case 201:
                 return {
@@ -44,14 +44,16 @@ export const actions: Actions = {
                     form
                 };
             case 409:
-                return {
+                console.log("user already exists")
+                return fail(409, {
                     status: 409,
                     body: {
                         error: 'User already exists',
                     },
                     form
-                };
-        }
+                });
+        };
+
         return {
             form,
         };

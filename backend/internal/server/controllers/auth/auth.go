@@ -1,15 +1,15 @@
 package auth
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 
 	_ "github.com/IainMcl/HereWeGo/docs"
 	"github.com/IainMcl/HereWeGo/internal/logging"
 	models "github.com/IainMcl/HereWeGo/internal/models/user"
 	"github.com/IainMcl/HereWeGo/internal/services"
 	"github.com/IainMcl/HereWeGo/internal/util"
-	"github.com/jackc/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
@@ -125,16 +125,19 @@ func Register(c echo.Context) error {
 
 	err := user.CreateUser(db)
 
-	// TODO: This isn't catching the error even thought it is a pgconn.PgError
-
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) {
-		// err is a pgconn.PgError, handle it
-		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already in use"})
+	fmt.Println(err)
+	// var pgErr *pgconn.PgError
+	// if errors.As(err, &pgErr) {
+	// 	if err.(*pgconn.PgError).Code == "23505" {
+	// 		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already exists"})
+	// 	}
+	// }
+	if strings.Contains(err.Error(), "23505") {
+		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already exists"})
 	}
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to create user", "error": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, RegisterResponse{UserName: user.Username, Email: user.Email})
 }

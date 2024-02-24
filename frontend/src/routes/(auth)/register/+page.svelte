@@ -2,10 +2,22 @@
     // import { Icons } from "$lib/components/icons";
     import type { PageData } from "./$types";
     import RegisterForm from "./register-form.svelte";
-    import { Button } from "$lib/components/ui/button";
+    import { Toaster } from "$lib/components/ui/sonner";
+    import { toast } from "svelte-sonner";
     import * as Card from "$lib/components/ui/card";
 
     export let data: PageData;
+    export let form: any;
+
+    // If the state of the form changes
+    $: {
+        console.log(form);
+        if (form?.status === 409) {
+            toast.error("User already exists");
+        } else if (form?.status === 200) {
+            toast.success("Account created");
+        }
+    }
 </script>
 
 <svelte:head>
@@ -21,26 +33,27 @@
         >
     </Card.Header>
     <Card.Content class="grid gap-4">
-        <div class="grid grid-cols-2 gap-6">
+        <!-- <div class="grid grid-cols-2 gap-6">
             <Button variant="outline">
-                <!-- <Icons.gitHub class="mr-2 h-4 w-4" /> -->
+                <Icons.gitHub class="mr-2 h-4 w-4" />
                 GitHub
             </Button>
             <Button variant="outline">
-                <!-- <Icons.google class="mr-2 h-4 w-4" /> -->
+                <Icons.google class="mr-2 h-4 w-4" /> 
                 Google
             </Button>
-        </div>
+        </div> -->
         <div class="relative">
             <div class="absolute inset-0 flex items-center">
                 <span class="w-full border-t" />
             </div>
-            <div class="relative flex justify-center text-xs uppercase">
+            <!-- <div class="relative flex justify-center text-xs uppercase">
                 <span class="bg-card px-2 text-muted-foreground">
                     Or continue with
                 </span>
-            </div>
+            </div> -->
         </div>
-        <RegisterForm {data} />
+        <RegisterForm {data} {form} />
     </Card.Content>
+    <Toaster />
 </Card.Root>

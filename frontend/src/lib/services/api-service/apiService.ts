@@ -42,15 +42,8 @@ export async function unauthenticatedRequest(method: string = 'GET', url: string
     if (data) {
         options.body = JSON.stringify(data);
     }
-    console.log(fullUrl, options);
     const response = await fetch(fullUrl, options);
-    console.log(response);
-    if (!response.ok) {
-        throw new Error(`HTTP error: status: ${response.status}`);
-    } else if (response.status === 204) {
-        return;
-    }
-    return await response.json();
+    return response;
 }
 
 export async function login(email: string, password: string): Promise<any> {
