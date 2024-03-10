@@ -1,18 +1,17 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label";
+    import type { ActionData } from "./$types";
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
-    import SuperDebug from "sveltekit-superforms";
+    import Loader2 from "lucide-svelte/icons/loader-2";
+    // import SuperDebug from "sveltekit-superforms";
     import {
         registerFormSchema,
         type RegisterFormSchema,
     } from "./register-form";
-    import {
-        type SuperValidated,
-        type Infer,
-        superForm,
-    } from "sveltekit-superforms";
+    import { type SuperValidated, superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import { toast } from "svelte-sonner";
 
     export let data: {
         form: SuperValidated<RegisterFormSchema>;
@@ -20,11 +19,11 @@
     const registerForm = superForm(data.form, {
         validators: zodClient(registerFormSchema),
         multipleSubmits: "prevent",
+        delayMs: 500,
     });
+    export let form: ActionData;
 
-    export let form: any;
-
-    const { form: formData, errors, enhance } = registerForm;
+    const { form: formData, errors, enhance, delayed } = registerForm;
 </script>
 
 <form method="POST" action="?/register" use:enhance>
@@ -48,13 +47,18 @@
                 >{/if}
         </div>
         {#if form?.status === 409}
-            <p class="text-red-600">
-                User already exists <a href="#">log in?</a>
-            </p>
+            <p class="text-red-600 test-sm">User already exists</p>
         {/if}
-        <Button on:click|once type="submit" class="w-full"
-            >Create account</Button
-        >
+        {#if !$delayed}
+            <Button on:click|once type="submit" class="w-full"
+                >Create account</Button
+            >
+        {:else if $delayed}
+            <Button disabled>
+                <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+            </Button>
+        {/if}
     </div>
 </form>
 

@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -125,14 +124,13 @@ func Register(c echo.Context) error {
 
 	err := user.CreateUser(db)
 
-	fmt.Println(err)
 	// var pgErr *pgconn.PgError
 	// if errors.As(err, &pgErr) {
 	// 	if err.(*pgconn.PgError).Code == "23505" {
 	// 		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already exists"})
 	// 	}
 	// }
-	if strings.Contains(err.Error(), "23505") {
+	if err != nil && strings.Contains(err.Error(), "23505") {
 		return c.JSON(http.StatusConflict, map[string]string{"message": "Email already exists"})
 	}
 

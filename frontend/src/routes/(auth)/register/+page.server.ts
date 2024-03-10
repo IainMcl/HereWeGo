@@ -1,9 +1,10 @@
 import type { PageServerLoad, Actions } from './$types';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { registerFormSchema } from './register-form';
 import { unauthenticatedRequest } from '@/services/api-service/apiService';
+import { toast } from 'svelte-sonner';
 
 export const load: PageServerLoad = async () => {
     return {
@@ -14,11 +15,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
     register: async ({ request }) => {
-        console.log("register action called")
-        // console.log(request);
-        // const form = await request.formData();
         const form = await superValidate(request, zod(registerFormSchema));
-        // console.log(form);
         if (!form.valid) {
             console.log("form not valid")
             return fail(400, {
@@ -26,8 +23,6 @@ export const actions: Actions = {
             });
         }
 
-        // let email = form.get('email');
-        // let password = form.get('password');
         const { email, password } = form.data;
         const response = await unauthenticatedRequest('POST', '/auth/register', {
             email,
@@ -36,13 +31,12 @@ export const actions: Actions = {
 
         switch (response.status) {
             case 201:
-                return {
-                    status: 201,
-                    headers: {
-                        // 'set-cookie': response.headers.get('set-cookie'),
-                    },
-                    form
-                };
+                console.log("user created");
+                let resp = await response.json();
+                let createdEmail = resp.email;
+                toast.success('User created', { description: `User ${createdEmail} has been created. You can now login.` });
+                // Redirect to login page /login
+                redirect(303, "/login")
             case 409:
                 console.log("user already exists")
                 return fail(409, {
@@ -52,10 +46,14 @@ export const actions: Actions = {
                     },
                     form
                 });
-        };
-
-        return {
-            form,
+            default:
+                return fail(500, {
+                    status: 500,
+                    body: {
+                        error: 'Internal server error',
+                    },
+                    form
+                });
         };
     },
 };

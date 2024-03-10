@@ -1,23 +1,12 @@
 <script lang="ts">
     // import { Icons } from "$lib/components/icons";
-    import type { PageData } from "./$types";
+    import type { PageData, ActionData } from "./$types";
     import RegisterForm from "./register-form.svelte";
-    import { Toaster } from "$lib/components/ui/sonner";
-    import { toast } from "svelte-sonner";
     import * as Card from "$lib/components/ui/card";
+    import { Button } from "$lib/components/ui/button";
 
     export let data: PageData;
-    export let form: any;
-
-    // If the state of the form changes
-    $: {
-        console.log(form);
-        if (form?.status === 409) {
-            toast.error("User already exists");
-        } else if (form?.status === 200) {
-            toast.success("Account created");
-        }
-    }
+    export let form: ActionData;
 </script>
 
 <svelte:head>
@@ -54,6 +43,15 @@
             </div> -->
         </div>
         <RegisterForm {data} {form} />
+        <div class="actions">
+            <p class="text-center text-md">
+                Already have an account?
+                <Button
+                    variant="link"
+                    href="/login"
+                    class="text-primary-500 underline">Login</Button
+                >
+            </p>
+        </div>
     </Card.Content>
-    <Toaster />
 </Card.Root>
