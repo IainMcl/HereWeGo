@@ -1,7 +1,7 @@
-<script>
-	import "../app.pcss";
+<script lang="ts">
+    import "../app.pcss";
+    import Header from "$lib/components/layouts/header";
 </script>
 
-<main>
-	<slot />
-</main>
+<Header />
+<slot />

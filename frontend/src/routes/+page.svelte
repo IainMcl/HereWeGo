@@ -1,4 +1,5 @@
 <script lang="ts">
+	export let data;
 </script>
 
 <svelte:head>
@@ -6,4 +7,8 @@
 	<meta name="description" content="Polls polls and more polls" />
 </svelte:head>
 
-<section>this is the landing page</section>
+<section>
+	<p>this is the landing page</p>
+
+	<p>Here is the data: {data}</p>
+</section>
