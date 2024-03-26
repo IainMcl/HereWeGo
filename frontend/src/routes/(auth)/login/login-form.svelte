@@ -3,7 +3,6 @@
     import type { ActionData } from "./$types";
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
-    import Loader2 from "lucide-svelte/icons/loader-2";
     import { loginFormSchema, type LoginFormSchema } from "./login-form";
     import { type SuperValidated, superForm } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
@@ -18,6 +17,7 @@
         multipleSubmits: "prevent",
         delayMs: 500,
         onResult: ({ result }) => {
+            console.log(result);
             switch (result.data.status) {
                 case 400:
                     toast.error("Invalid email or password");
@@ -26,8 +26,6 @@
                     toast.error("Server error");
                     break;
                 case 302:
-                    console.log(result);
-                    localStorage.setItem("token", result.data.token);
                     goto(result.data.headers.location);
                     break;
                 default:
@@ -36,7 +34,7 @@
             }
         },
     });
-    export let form: ActionData;
+    // export let form: ActionData;
 
     const { form: formData, errors, enhance, delayed } = registerForm;
 </script>

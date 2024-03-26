@@ -86,6 +86,12 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to generate token"})
 	}
 
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	cookie.Path = "/"
+	cookie.HttpOnly = true
+	c.SetCookie(cookie)
 	return c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
 

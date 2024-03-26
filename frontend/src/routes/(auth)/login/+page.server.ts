@@ -13,7 +13,7 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions: Actions = {
-    login: async ({ url, request }) => {
+    login: async ({ cookies, url, request }) => {
         const form = await superValidate(request, zod(loginFormSchema));
         if (!form.valid) {
             return fail(400, {
@@ -22,9 +22,21 @@ export const actions: Actions = {
         }
 
         const { email, password } = form.data;
-        const { resp: response, token: token } = await login(email, password);
+        const { headers, status } = await login(email, password);
 
-        switch (response.status) {
+        const setCookie = headers.get('set-cookie');
+        const [cookie, path, httpOnly] = setCookie.split('; ');
+
+        const [name, value] = cookie.split('=');
+        const [_, pathValue] = path.split('=');
+        const isHttpOnly = httpOnly === 'HttpOnly';
+
+        cookies.set(name, value, {
+            path: pathValue,
+            httpOnly: isHttpOnly
+        });
+
+        switch (status) {
             case 200:
                 const redirectTo = url.searchParams.get("redirectTo");
                 if (redirectTo) {
@@ -32,16 +44,16 @@ export const actions: Actions = {
                         status: 302,
                         headers: {
                             location: `/${redirectTo.slice(1)}`,
+                            'set-cookie': setCookie
                         },
-                        token: token
                     };
                 }
                 return {
                     status: 302,
                     headers: {
                         location: '/',
+                        'set-cookie': setCookie
                     },
-                    token: token
                 };
             case 401:
                 return fail(401, {
